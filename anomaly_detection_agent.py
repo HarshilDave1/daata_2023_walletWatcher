@@ -48,5 +48,9 @@ initial_prompt = """
 
 """
 
-agent = AnomalyDetectionAgent()
-agent.initiate_chat(initial_prompt)
+def main():
+    agent = AnomalyDetectionAgent()
+    agent.initiate_chat(initial_prompt)
+
+if __name__ == "__main__":
+    main()

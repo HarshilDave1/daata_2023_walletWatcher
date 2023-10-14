@@ -28,9 +28,13 @@ def send_alert(anomalies):
     for anomaly in anomalies:
         print(anomaly)
 
-while True:
-    transactions = fetch_transactions()
-    anomalies = detect_anomalies(transactions)
-    if anomalies:
-        send_alert(anomalies)
-    time.sleep(60)
+def main():
+    while True:
+        transactions = fetch_transactions()
+        anomalies = detect_anomalies(transactions)
+        if anomalies:
+            send_alert(anomalies)
+        time.sleep(60)
+
+if __name__ == "__main__":
+    main()

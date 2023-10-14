@@ -28,9 +28,8 @@ class AnomalyDetectionAgent:
 
 
     def detect_anomalies(self, transactions):
-        message = transactions #Message should be something like 'Explain what is happening in this transaction'
-        agent = AnomalyDetectionAgent()
-        response = self.initiate_chat(initial_prompt)
+        message = f"Explain what is happening in this transaction: {transactions}"
+        response = self.initiate_chat(message)
         return response
 
     def initiate_chat(self, message):

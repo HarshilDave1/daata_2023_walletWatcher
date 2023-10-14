@@ -26,7 +26,6 @@ class AnomalyDetectionAgent:
             is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
         )
 
-
     def detect_anomalies(self, transactions):
         message = f"Explain what is happening in this transaction: {transactions}"
         response = self.initiate_chat(message)

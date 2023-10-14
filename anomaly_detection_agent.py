@@ -26,18 +26,12 @@ class AnomalyDetectionAgent:
             is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
         )
 
-    def is_anomalous(self, tx):
-        # Your anomaly detection logic here
-        # Use the AI model to determine if the transaction is anomalous
-        # Return True if anomalous, False otherwise
-        return False
 
     def detect_anomalies(self, transactions):
-        anomalies = []
-        for tx in transactions['data']['items']:
-            if self.is_anomalous(tx):
-                anomalies.append(tx)
-        return anomalies
+        message = transactions #Message should be something like 'Explain what is happening in this transaction'
+        agent = AnomalyDetectionAgent()
+        response = self.initiate_chat(initial_prompt)
+        return response
 
     def initiate_chat(self, message):
         self.user_proxy.initiate_chat(self.assistant, message=message)

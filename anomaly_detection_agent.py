@@ -11,7 +11,11 @@ config_list = [
         'api_key': OPEN_API_KEY,
     },  ]
 
-
+def is_anomalous(tx):
+    # Your anomaly detection logic here
+    # Use the AI model to determine if the transaction is anomalous
+    # Return True if anomalous, False otherwise
+    return False
 
 # create an AssistantAgent instance named "assistant"
 assistant = autogen.AssistantAgent(

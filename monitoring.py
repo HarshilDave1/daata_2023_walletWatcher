@@ -1,12 +1,12 @@
 import time
 import requests
-import anomaly_detection_agent
+from anomaly_detection_agent import AnomalyDetectionAgent
 from dotenv import load_dotenv
 import os
 load_dotenv()
 
 OPEN_API_KEY = os.getenv("OPEN_API_KEY")
-safe = '0x171a3ad89cFb7888342f10F4740F72e6F6098A4C'
+safe = '0x31d7a5194fe60ac209cf1ce2d539c9a60662ed6b'
 Covalent_API_KEY = os.getenv("Covalent_API_KEY")
 chain = 'avalanche-mainnet' # for mainnet
 
@@ -19,8 +19,9 @@ def fetch_transactions():
 
 def detect_anomalies(transactions):
     anomalies = []
+    agent = AnomalyDetectionAgent
     for tx in transactions['data']['items']:
-        if anomaly_detection_agent.is_anomalous(tx):  # Call anomaly_detection_agent.is_anomalous function
+        if agent.detect_anomalies(tx):  # Call anomaly_detection_agent.is_anomalous function
             anomalies.append(tx)
     return anomalies
 

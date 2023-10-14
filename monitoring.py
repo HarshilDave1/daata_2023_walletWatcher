@@ -21,8 +21,7 @@ def detect_anomalies(transactions):
 def send_alert(anomalies):
     # Your alerting logic here
     for anomaly in anomalies:
-        # Print anomaly
-        pass
+        print(anomaly)  # Print anomaly
 
 while True:
     transactions = fetch_transactions()

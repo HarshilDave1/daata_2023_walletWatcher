@@ -19,9 +19,9 @@ def fetch_transactions():
 
 def detect_anomalies(transactions):
     anomalies = []
-    agent = AnomalyDetectionAgent
+    agent = AnomalyDetectionAgent()  # Create an instance of AnomalyDetectionAgent
     for tx in transactions['data']['items']:
-        if agent.detect_anomalies(tx):  # Call anomaly_detection_agent.is_anomalous function
+        if agent.detect_anomalies(tx):  # Call detect_anomalies method on the instance
             anomalies.append(tx)
     return anomalies
 

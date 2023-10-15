@@ -3,7 +3,7 @@ import requests
 from monitoring_agents2 import AnomalyDetectionAgent
 from dotenv import load_dotenv
 import os
-import database
+from database import insert_transaction, transaction_exists
 load_dotenv()
 
 OPEN_API_KEY = os.getenv("OPEN_API_KEY")
@@ -12,9 +12,14 @@ Covalent_API_KEY = os.getenv("Covalent_API_KEY")
 chain = 'avalanche-mainnet' # for mainnet
 
 def fetch_transactions():
-    url = f'https://api.covalenthq.com/v1/{chain}/address/{safe}/transactions_v3/?key={Covalent_API_KEY}&with-safe=true&no-logs=true'
+    page = 0 #only get the latest transactions
+    url = f'https://api.covalenthq.com/v1/{chain}/address/{safe}/transactions_v3/page/{page}/?key={Covalent_API_KEY}&no-logs=true&with-safe=true'
     r = requests.get(url)
     data = r.json()
+    # Save transactions into the database
+    for tx in data['data']['items']:
+        insert_transaction(tx)  
+            
     return data
 
 

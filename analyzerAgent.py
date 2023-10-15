@@ -75,12 +75,24 @@ class AnalyzerAgent:
             is_anomaly = self.model.predict(features)[0] == -1  # -1 indicates anomaly
             
             if is_anomaly:
-                anomalies.append((tx, anomaly_score))
+                # Convert the transaction tuple to a dictionary with labels
+                tx_dict = {
+                    "tx_hash": tx[0],
+                    "from_address": tx[1],
+                    "to_address": tx[2],
+                    "value": tx[3],
+                    "gas_spent": tx[4],
+                    "fees_paid": tx[5],
+                    "block_signed_at": tx[6],
+                    "anomaly_score": anomaly_score
+                }
+                anomalies.append(tx_dict)
         
         # Sort anomalies by their scores to see the most anomalous transactions first
-        anomalies.sort(key=lambda x: x[1])
+        anomalies.sort(key=lambda x: x["anomaly_score"])
         
         return anomalies
+
 
 
 

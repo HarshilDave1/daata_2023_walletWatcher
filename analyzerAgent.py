@@ -14,6 +14,21 @@ class AnalyzerAgent:
         data = cursor.fetchall()
         conn.close()
         return data
+    def fetch_latest_data(self):
+        conn = sqlite3.connect('transactions.db')
+        cursor = conn.cursor()
+        
+        # Fetch the latest 100 transactions ordered by block_signed_at in descending order
+        cursor.execute('''
+        SELECT tx_hash, from_address, to_address, value, gas_spent, fees_paid, block_signed_at 
+        FROM transactions 
+        ORDER BY block_signed_at DESC 
+        LIMIT 100
+        ''')
+        data = cursor.fetchall()
+        
+        conn.close()
+        return data
 
 
     def engineer_features(self, transactions):
@@ -44,10 +59,30 @@ class AnalyzerAgent:
         self.model = IsolationForest(contamination=0.001)  # Assuming 0% of the data is considered as anomalies
         self.model.fit(data)
 
-    def predict(self, transaction):
-        # Engineer features for the new transaction
-        features = self.engineer_features([transaction])
-        return self.model.predict(features)[0] == -1  # -1 indicates anomaly
+    def predict(self):
+        # Fetch the latest 100 transactions from the database
+        latest_transactions = self.fetch_latest_data()
+        
+        anomalies = []
+        for tx in latest_transactions:
+            # Engineer features for the transaction
+            features = self.engineer_features([tx])
+            
+            # Get the anomaly score
+            anomaly_score = self.model.decision_function(features)[0]
+            
+            # Check if the transaction is an anomaly
+            is_anomaly = self.model.predict(features)[0] == -1  # -1 indicates anomaly
+            
+            if is_anomaly:
+                anomalies.append((tx, anomaly_score))
+        
+        # Sort anomalies by their scores to see the most anomalous transactions first
+        anomalies.sort(key=lambda x: x[1])
+        
+        return anomalies
+
+
 
     def retrain(self):
         data = self.fetch_data()

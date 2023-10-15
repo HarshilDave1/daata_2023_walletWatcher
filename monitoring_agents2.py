@@ -19,7 +19,7 @@ class AnomalyDetectionAgent:
         self.monitor = autogen.AssistantAgent(
             name="Monitor",
             llm_config=config_list,
-            system_message="Monitors the user's wallet for any transactions. Reports transactions in real-time."
+            system_message="Monitors the user's wallet for any transactions. Reports transactions in real-time. Respond 'Terminate' if no task given. "
         )
         
         # Analyzer Agent
@@ -46,7 +46,7 @@ class AnomalyDetectionAgent:
         # User Proxy Agent
         self.user_proxy = autogen.UserProxyAgent(
             name="User Proxy",
-            system_message="Represents the user. Receives alerts and provides feedback or directives to other agents.",
+            system_message="Represents the user. Receives alerts and provides feedback or directives to other agents. TERMINATE if task is completed.",
             human_input_mode="ALWAYS",
             is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
         )
@@ -75,8 +75,17 @@ class AnomalyDetectionAgent:
         # Group Chat for the agents
         self.groupchat = autogen.GroupChat(
             agents=[self.monitor, self.analyzer, self.notifier, self.guardian, self.user_proxy, self.auditor, self.planner, self.critic],
-            messages=[],
-            max_round=50
+            messages=[
+                        "Monitor: Please provide details of the latest transactions for the user's wallet. Respond 'Terminate' if no task given ",
+                        "Analyzer: Assess these transactions for potential risks using AI models and predefined rules.",
+                        "Notifier: If any high-risk transactions are detected, alert the User Proxy with details.",
+                        "Guardian: Based on the risk assessment, suggest protective actions if necessary.",
+                        "User Proxy: Please review any alerts and provide feedback or directives.",
+                        "Auditor: Periodically review the actions taken and provide feedback.",
+                        "Planner: Refine the strategy based on feedback from the Auditor and User Proxy.",
+                        "Critic: Ensure all agents are functioning correctly and provide feedback where necessary.",
+                        ],
+            max_round=5
         )
         
         # Manager for the group chat
@@ -84,15 +93,6 @@ class AnomalyDetectionAgent:
 
     def detect_anomalies(self, transactions):
         message = f"""
-        Monitor: Please provide details of the latest transactions for the user's wallet.
-        Analyzer: Assess these transactions for potential risks using AI models and predefined rules.
-        Notifier: If any high-risk transactions are detected, alert the User Proxy with details.
-        Guardian: Based on the risk assessment, suggest protective actions if necessary.
-        User Proxy: Please review any alerts and provide feedback or directives.
-        Auditor: Periodically review the actions taken and provide feedback.
-        Planner: Refine the strategy based on feedback from the Auditor and User Proxy.
-        Critic: Ensure all agents are functioning correctly and provide feedback where necessary.
-
         Current Transaction Details: {transactions}
         """
         response = self.initiate_chat(message)
@@ -104,7 +104,7 @@ class AnomalyDetectionAgent:
 
 
 initial_prompt = """
-Get Hello World response from all agents
+
 """
 
 def main():

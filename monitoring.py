@@ -1,6 +1,6 @@
 import time
 import requests
-from anomaly_detection_agent import AnomalyDetectionAgent
+from monitoring_agents2 import AnomalyDetectionAgent
 from dotenv import load_dotenv
 import os
 load_dotenv()

@@ -1,5 +1,6 @@
 from sklearn.ensemble import IsolationForest
 import sqlite3
+import joblib
 
 class AnalyzerAgent:
     def __init__(self):
@@ -52,11 +53,27 @@ class AnalyzerAgent:
         data = self.fetch_data()
         features = self.engineer_features(data)
         self.train(features)
+        self.save_model()
+        
+    def save_model(self, filename="trained_model.pkl"):
+        """Save the trained model to a file."""
+        joblib.dump(self.model, filename)
+
+    def load_model(self, filename="trained_model.pkl"):
+        """Load a pretrained model from a file."""
+        self.model = joblib.load(filename)
+
 
 # Run training
 def main():
     analyzer = AnalyzerAgent()
-    analyzer.retrain()  # Initial training
+    # Check if a pretrained model exists and load it
+    try:
+        analyzer.load_model()
+        print("Loaded pretrained model.")
+    except:
+        print("No pretrained model found. Training a new model...")
+        analyzer.retrain()  # Initial training
 
 if __name__ == "__main__":
     main()

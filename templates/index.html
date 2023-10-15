@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anomaly Detection</title>
+</head>
+<body>
+    <h1>Anomaly Detection</h1>
+    <form id="safeForm">
+        <label for="safe_address">Safe Address:</label>
+        <input type="text" id="safe_address" name="safe_address">
+        <button type="submit">Start Detection</button>
+    </form>
+    <h2>Results:</h2>
+    <textarea id="results" rows="10" cols="50" readonly></textarea>
+
+    <script>
+        document.getElementById('safeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const safe_address = document.getElementById('safe_address').value;
+            fetch('/start', {
+                method: 'POST',
+                body: new URLSearchParams({ 'safe_address': safe_address })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('results').value = JSON.stringify(data, null, 2);
+            });
+        });
+    </script>
+</body>
+</html>

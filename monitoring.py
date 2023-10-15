@@ -3,6 +3,7 @@ import requests
 from monitoring_agents2 import AnomalyDetectionAgent
 from dotenv import load_dotenv
 import os
+import database
 load_dotenv()
 
 OPEN_API_KEY = os.getenv("OPEN_API_KEY")
@@ -17,13 +18,26 @@ def fetch_transactions():
     return data
 
 
+
+def fetch_old_transactions():
+    while #while transactions['data']['items'] is not empty
+        url = f'https://api.covalenthq.com/v1/{chain}/address/{safe}/transactions_v3/page/{page}/?key={Covalent_API_KEY}&no-logs=true&with-safe=true'
+        r = requests.get(url)
+        data = r.json()
+        #Save into database
+    return data
+
+
 def detect_anomalies(transactions):
     anomalies = []
-    agent = AnomalyDetectionAgent()  
+    agent = AnomalyDetectionAgent()
     for tx in transactions['data']['items']:
-        if agent.detect_anomalies(tx):  
-            anomalies.append(tx)
+        if not transaction_exists(tx['tx_hash']):
+            if agent.detect_anomalies(tx):
+                anomalies.append(tx)
+            insert_transaction(tx)
     return anomalies
+
 
 def send_alert(anomalies):
     for anomaly in anomalies:

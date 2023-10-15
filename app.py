@@ -13,7 +13,10 @@ def start_detection():
     # Set the safe address in your monitoring module
     monitoring.safe = safe_address
     anomalies = monitoring.detect_anomalies()
-    return jsonify(anomalies)
+    if not anomalies:
+        return jsonify({"message": "No anomalies detected."})
+    else:
+        return jsonify(anomalies)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -25,7 +25,11 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('results').value = JSON.stringify(data, null, 2);
+                if (data.message) {
+                    document.getElementById('results').value = data.message;
+                } else {
+                    document.getElementById('results').value = JSON.stringify(data, null, 2);
+                }
             });
         });
     </script>

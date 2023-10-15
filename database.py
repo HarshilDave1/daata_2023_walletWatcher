@@ -23,8 +23,8 @@ def insert_transaction(tx):
     cursor = conn.cursor()
     
     cursor.execute('''
-    INSERT OR IGNORE INTO transactions (tx_hash, to_address, value, gas_spent, fees_paid)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT OR IGNORE INTO transactions (tx_hash, from_address, to_address, value, gas_spent, fees_paid)
+    VALUES (?, ?, ?, ?, ?,?)
     ''', (tx['tx_hash'], tx['from_address'], tx['to_address'], float(tx['value']), tx['gas_spent'], float(tx['fees_paid'])))
     
     conn.commit()

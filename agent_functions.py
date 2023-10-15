@@ -38,7 +38,10 @@ functions = [
     {
         "name": "analyze_transaction",
         "description": "Access the database and read the latest transaction information.",
-        "parameters": {} ,
+        "parameters": {
+            "type": "object",  # Specify the type as "object"
+            "properties": {}  # Specify an empty properties object
+        }
     },
     {
         "name": "notify_user",
@@ -69,10 +72,13 @@ functions = [
             "required": ["private_key"],
         },
     },
-    {
-        "name": "get_user_feedback",
-        "description": "Allow user feedback.",
-        "parameters": {} 
+        {
+        "name": "analyze_transaction",
+        "description": "Access the database and read the latest transaction information.",
+        "parameters": {
+            "type": "object",  # Specify the type as "object"
+            "properties": {}  # Specify an empty properties object
+        }
     },
 ]
 

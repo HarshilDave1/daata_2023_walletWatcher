@@ -2,11 +2,13 @@ import autogen
 import os
 from dotenv import load_dotenv
 from analyzerAgent import AnalyzerAgent
-
+from agent_functions import *
 load_dotenv()
 
 OPEN_API_KEY = os.getenv("OPEN_API_KEY")
-config_list = {
+
+llm_config = {
+    "functions": functions,
     "seed": 42,
     "temperature": 0,
     'model': 'gpt-3.5-turbo',
@@ -14,33 +16,37 @@ config_list = {
     'api_key': OPEN_API_KEY,
 }
 
+
 class AnomalyDetectionAgent:
     def __init__(self):
         # Monitor Agent
         self.monitor = autogen.AssistantAgent(
             name="Monitor",
-            llm_config=config_list,
+            llm_config=llm_config,
             system_message="Monitors the user's wallet for any transactions. Reports transactions in real-time. Respond 'Terminate' if no task given. "
         )
                 
         # Analyzer Agent
+        #TODO: Program function to access database and read transaction information to determine cause of anomaly. 
         self.analyzer = autogen.AssistantAgent(
             name="Analyzer",
-            llm_config=config_list,
+            llm_config=llm_config,
             system_message="Analyzes transactions for potential risks. Uses AI and predefined rules to assess transaction safety. Respond 'Terminate' if no task given."
         )
         
         # Notifier Agent
+        #TODO: Program function to email user to notify them. Include information about the high-risk transaction.
         self.notifier = autogen.AssistantAgent(
             name="Notifier",
-            llm_config=config_list,
+            llm_config=llm_config,
             system_message="Responsible for notifying the user about high-risk transactions. Provides details and seeks user input if necessary."
         )
         
         # Guardian Agent
+        #TODO: Program function to move funds if Guardian calls it. Can move funds to predetermined wallet. Requires private key.
         self.guardian = autogen.AssistantAgent(
             name="Guardian",
-            llm_config=config_list,
+            llm_config=llm_config,
             system_message="Takes protective actions in case of high-risk transactions. Acts based on predefined rules or user input."
         )
         
@@ -49,28 +55,29 @@ class AnomalyDetectionAgent:
             name="User_Proxy",
             code_execution_config={"last_n_messages": 3, "work_dir": "groupchat"},
             system_message="Represents the user. Receives alerts and provides feedback or directives to other agents. TERMINATE if task is completed.",
-            human_input_mode="ALWAYS",
+            human_input_mode="NEVER",
             is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
         )
         
         # Auditor Agent
         self.auditor = autogen.AssistantAgent(
             name="Auditor",
-            llm_config=config_list,
+            llm_config=llm_config,
             system_message="Reviews the system's performance. Ensures accuracy and reliability."
         )
         
         # Planner Agent
+        #TODO: Allow user to give feedback. 
         self.planner = autogen.AssistantAgent(
             name="Planner",
-            llm_config=config_list,
+            llm_config=llm_config,
             system_message="Refines the system's strategy. Updates rules and heuristics based on feedback."
         )
         
         # Critic Agent
         self.critic = autogen.AssistantAgent(
             name="Critic",
-            llm_config=config_list,
+            llm_config=llm_config,
             system_message="Double checks plans, claims, and actions. Provides feedback to ensure accuracy and reliability."
         )
         
@@ -83,7 +90,7 @@ class AnomalyDetectionAgent:
         )
         
         # Manager for the group chat
-        self.manager = autogen.GroupChatManager(groupchat=self.groupchat, llm_config=config_list)
+        self.manager = autogen.GroupChatManager(groupchat=self.groupchat, llm_config=llm_config)
 
     def detect_anomalies(self):
         analyzer = AnalyzerAgent()
@@ -101,6 +108,12 @@ class AnomalyDetectionAgent:
         return response
 
     def initiate_chat(self, message):
+        # Register the functions
+        self.analyzer.register_function(function_map={"analyze_transaction": analyze_transaction})
+        self.notifier.register_function(function_map={"notify_user": notify_user})
+        self.guardian.register_function(function_map={"move_funds": move_funds})
+        self.planner.register_function(function_map={"get_user_feedback": get_user_feedback})
+
         self.user_proxy.initiate_chat(self.manager, message=message)
         return autogen.ChatCompletion.logged_history
 

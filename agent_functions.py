@@ -1,6 +1,17 @@
 import sqlite3
 import smtplib
 from email.message import EmailMessage
+from IPython import get_ipython
+
+def exec_python(cell):
+    ipython = get_ipython()
+    result = ipython.run_cell(cell)
+    log = str(result.result)
+    if result.error_before_exec is not None:
+        log += f"\n{result.error_before_exec}"
+    if result.error_in_exec is not None:
+        log += f"\n{result.error_in_exec}"
+    return log
 
 # Define the function for the Analyzer Agent
 def analyze_transaction():
@@ -20,8 +31,9 @@ def notify_user(transaction):
     msg['From'] = 'sender_email@example.com'
     msg['To'] = 'receiver_email@example.com'
     # Send the email
-    with smtplib.SMTP('smtp.example.com') as s:
-        s.send_message(msg)
+    # with smtplib.SMTP('smtp.example.com') as s:
+    #     s.send_message(msg)
+    print(msg)
 
 # Define the function for the Guardian Agent
 def move_funds(private_key):
@@ -35,6 +47,20 @@ def get_user_feedback():
 
 
 functions = [
+    {
+            "name": "python",
+            "description": "run cell in ipython and return the execution result.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "cell": {
+                        "type": "string",
+                        "description": "Valid Python cell to execute.",
+                    }
+                },
+                "required": ["cell"],
+            },
+        },
     {
         "name": "analyze_transaction",
         "description": "Access the database and read the latest transaction information.",

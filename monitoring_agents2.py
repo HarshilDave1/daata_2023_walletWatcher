@@ -2,7 +2,7 @@ import autogen
 import os
 from dotenv import load_dotenv
 from analyzerAgent import AnalyzerAgent
-from agent_functions import *
+from agent_functions import analyze_transaction, notify_user, move_funds, get_user_feedback, functions
 load_dotenv()
 
 OPEN_API_KEY = os.getenv("OPEN_API_KEY")
@@ -31,7 +31,7 @@ class AnomalyDetectionAgent:
         self.analyzer = autogen.AssistantAgent(
             name="Analyzer",
             llm_config=llm_config,
-            system_message="Analyzes transactions for potential risks. Uses AI and predefined rules to assess transaction safety. Respond 'Terminate' if no task given."
+            system_message="Analyzes transactions for potential risks. Uses AI and predefined rules to assess transaction safety. Can also write python functions to analyze transactions database. Ask User to run function. Respond 'Terminate' if no task given."
         )
         
         # Notifier Agent
@@ -54,7 +54,7 @@ class AnomalyDetectionAgent:
         self.user_proxy = autogen.UserProxyAgent(
             name="User_Proxy",
             code_execution_config={"last_n_messages": 3, "work_dir": "groupchat"},
-            system_message="Represents the user. Receives alerts and provides feedback or directives to other agents. TERMINATE if task is completed.",
+            system_message="Represents the user. Receives alerts and provides feedback or directives to other agents. Can execute python functions and return result to agent if requested. TERMINATE if task is completed.",
             human_input_mode="NEVER",
             is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
         )
@@ -109,11 +109,17 @@ class AnomalyDetectionAgent:
 
     def initiate_chat(self, message):
         # Register the functions
-        self.analyzer.register_function(function_map={"analyze_transaction": analyze_transaction})
-        self.notifier.register_function(function_map={"notify_user": notify_user})
-        self.guardian.register_function(function_map={"move_funds": move_funds})
-        self.planner.register_function(function_map={"get_user_feedback": get_user_feedback})
-
+        function_map = {
+            "analyze_transaction": analyze_transaction,
+            "notify_user": notify_user,
+            "move_funds": move_funds,
+            "get_user_feedback": get_user_feedback
+        }
+        
+        agents = [self.monitor, self.analyzer, self.notifier, self.guardian, self.user_proxy, self.auditor, self.planner, self.critic]
+        for agent in agents:
+            agent.register_function(function_map=function_map)
+            
         self.user_proxy.initiate_chat(self.manager, message=message)
         return autogen.ChatCompletion.logged_history
 

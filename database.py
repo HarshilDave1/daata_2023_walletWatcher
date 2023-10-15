@@ -8,6 +8,7 @@ def setup_database():
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS transactions (
         tx_hash TEXT PRIMARY KEY,
+        from_address TEXT,
         to_address TEXT,
         value REAL,
         gas_spent INTEGER,
@@ -24,7 +25,7 @@ def insert_transaction(tx):
     cursor.execute('''
     INSERT OR IGNORE INTO transactions (tx_hash, to_address, value, gas_spent, fees_paid)
     VALUES (?, ?, ?, ?, ?)
-    ''', (tx['tx_hash'], tx['to_address'], float(tx['value_quote']), tx['gas_spent'], float(tx['fees_paid'])))
+    ''', (tx['tx_hash'], tx['from_address'], tx['to_address'], float(tx['value']), tx['gas_spent'], float(tx['fees_paid'])))
     
     conn.commit()
     conn.close()

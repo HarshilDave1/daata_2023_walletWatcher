@@ -20,12 +20,24 @@ def fetch_transactions():
 
 
 def fetch_old_transactions():
-    while #while transactions['data']['items'] is not empty
+    page = 0  
+    while True:  
         url = f'https://api.covalenthq.com/v1/{chain}/address/{safe}/transactions_v3/page/{page}/?key={Covalent_API_KEY}&no-logs=true&with-safe=true'
         r = requests.get(url)
         data = r.json()
-        #Save into database
+        
+        # Check if the transactions list is empty
+        if not data['data']['items']:
+            break  # Exit the loop if there are no more transactions
+        
+        # Save transactions into the database
+        for tx in data['data']['items']:
+            insert_transaction(tx)  
+        
+        page += 1  
+
     return data
+
 
 
 def detect_anomalies(transactions):

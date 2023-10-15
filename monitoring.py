@@ -45,27 +45,20 @@ def fetch_old_transactions():
 
 
 
-def detect_anomalies(transactions):
+def detect_anomalies():
     anomalies = []
     agent = AnomalyDetectionAgent()
-    for tx in transactions['data']['items']:
-        if not transaction_exists(tx['tx_hash']):
-            if agent.detect_anomalies(tx):
-                anomalies.append(tx)
-            insert_transaction(tx)
+    anomalies = agent.detect_anomalies()
     return anomalies
 
 
-def send_alert(anomalies):
-    for anomaly in anomalies:
-        print(anomaly)
+
 
 def main():
+    fetch_old_transactions() #Get all transactions if this is the first time connecting wallet
     while True:
-        transactions = fetch_transactions()
-        anomalies = detect_anomalies(transactions)
-        if anomalies:
-            send_alert(anomalies)
+        fetch_transactions() # Stay updated with new transactions and detect anomalies
+        detect_anomalies() # Agents will have functions to push notifications to user. Or take steps to protect account
         time.sleep(60)
 
 if __name__ == "__main__":

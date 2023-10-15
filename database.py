@@ -31,10 +31,6 @@ def insert_transaction(tx):
     conn.commit()
     conn.close()
 
-def fetch_and_store_transactions():
-    transactions = fetch_transactions()
-    for tx in transactions['data']['items']:
-        insert_transaction(tx)
 
 def transaction_exists(tx_hash):
     conn = sqlite3.connect('transactions.db')

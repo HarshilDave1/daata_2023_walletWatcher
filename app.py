@@ -8,6 +8,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/start', methods=['POST'])
+
 def start_detection():
     safe_address = request.form.get('safe_address')
     # Set the safe address in your monitoring module
@@ -16,7 +17,8 @@ def start_detection():
     if not anomalies:
         return jsonify({"message": "No anomalies detected."})
     else:
-        return jsonify(anomalies)
+        return jsonify({"message": anomalies})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

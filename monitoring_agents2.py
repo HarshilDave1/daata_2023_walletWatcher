@@ -120,8 +120,11 @@ class AnomalyDetectionAgent:
         for agent in agents:
             agent.register_function(function_map=function_map)
             
-        self.user_proxy.initiate_chat(self.manager, message=message)
-        return autogen.ChatCompletion.logged_history
+        self.user_proxy.initiate_chat(self.manager, message=message, clear_history=False)
+        messages = self.user_proxy.chat_messages
+        chat_manager_messages = messages.get(self.manager, [])
+        formatted_messages = [msg["content"] for msg in chat_manager_messages if msg["content"]]
+        return "\n\n".join(formatted_messages)
 
 
 initial_prompt = """
